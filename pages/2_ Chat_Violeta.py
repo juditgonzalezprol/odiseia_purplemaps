@@ -77,29 +77,59 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.html(
-"""
-    <style>
-    .clickable {
-        color: rgb(46, 154, 255);
-        text-decoration: underline;
-    }
+# st.html(
+# """
+#     <style>
+#     .clickable {
+#         color: rgb(46, 154, 255);
+#         text-decoration: underline;
+#     }
     
-    div[data-testid="stChatMessageContent"] {
-        background-color: #cb6ce6;
-        color: white; # Expander content color
-    } 
+#     div[data-testid="stChatMessageContent"] {
+#         background-color: #cb6ce6;
+#         color: white; # Expander content color
+#     } 
     
-    div[data-testid="stChatMessage"] {
-        background-color: #cb6ce6;
-        color: white; # Adjust this for expander header color
-    }
-    </style>
-""")
+#     div[data-testid="stChatMessage"] {
+#         background-color: #cb6ce6;
+#         color: white; # Adjust this for expander header color
+#     }
+#     </style>
+# """)
+
 
 
 with st.sidebar:
-    st.markdown('<div class="sidebar-logo"><img src="https://i.imgur.com/UXR930j.png"></div>', unsafe_allow_html=True)
+
+    usuario = st.session_state["usuario"]
+    permisos = st.session_state["permisos"]
+
+    import pandas as pd
+    st.image("img/Purple_Maps.png", width=100)
+    # Cargamos la tabla de usuarios
+    dfusuarios = pd.read_csv('usuarios.csv')
+    # Filtramos la tabla de usuarios
+    dfUsuario =dfusuarios[(dfusuarios['usuario']==usuario)]
+    # Cargamos el nombre del usuario
+    nombre= dfUsuario['nombre'].values[0]
+    permisos= dfUsuario['permisos'].values[0]
+    #Mostramos el nombre del usuario
+    st.write(f"Hola **:blue-background[{nombre}]** ")
+    # Mostramos los enlaces de páginas
+    st.subheader("Servicios")
+    st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
+    st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
+    st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
+    if permisos == "administradora":
+        st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
+
+    # Botón para cerrar la sesión
+    btnSalir=st.button("Salir")
+    if btnSalir:
+        st.session_state.clear()
+        # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
+        st.rerun()
+
 
 # Inicializar estado de la sesión
 def init_session_state():
