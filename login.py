@@ -36,8 +36,6 @@ def generarMenu(usuario):
         usuario (str): usuario utilizado para generar el menú
     """
 
-    st.set_page_config(page_title="Puntos Violeta", page_icon="🟣", layout="wide")
-
     # 📌 Archivo donde se guarda la sesión del usuario
     SESSION_FILE = "session.txt"
 
