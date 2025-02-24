@@ -39,16 +39,7 @@ def generarMenu(usuario):
     # 📌 Archivo donde se guarda la sesión del usuario
     SESSION_FILE = "session.txt"
 
-    # 🔄 **Al iniciar la app, eliminar la sesión anterior**
-    if os.path.exists(SESSION_FILE):
-        os.remove(SESSION_FILE)
-
-    # 📝 **Función para guardar el usuario en archivo**
-    def guardar_sesion(usuario, permisos):
-        with open(SESSION_FILE, "w") as f:
-            f.write(f"{usuario}\n{permisos}")
-
-    # 📂 **Función para cargar la sesión desde archivo**
+    # 🔄 **Al iniciar la app, cargar la sesión**
     def cargar_sesion():
         if os.path.exists(SESSION_FILE):
             with open(SESSION_FILE, "r") as f:
@@ -57,17 +48,26 @@ def generarMenu(usuario):
                     return lines[0].strip(), lines[1].strip()  # Retorna usuario y permisos
         return None, None  # Si no hay sesión, retorna None
 
-    # 🟣 **Verificar si hay usuario logueado**
+    # 📝 **Función para guardar el usuario en archivo**
+    def guardar_sesion(usuario, permisos):
+        with open(SESSION_FILE, "w") as f:
+            f.write(f"{usuario}\n{permisos}")
+
+    # 📂 **Función para eliminar la sesión**
+    def eliminar_sesion():
+        if os.path.exists(SESSION_FILE):
+            os.remove(SESSION_FILE)
+
+    # 📌 **Intentar cargar la sesión al inicio**
     usuario, permisos = cargar_sesion()
 
+    # **Si el usuario no está autenticado, detener la ejecución**
     if usuario is None:
         st.warning("⚠️ No has iniciado sesión. Redirigiendo al login...")
-        st.stop()  # Detiene la ejecución para evitar errores
+        st.stop()
 
-    # 📌 Cargar la tabla de usuarios desde CSV
+    # 🔍 **Cargar la base de datos de usuarios**
     dfusuarios = pd.read_csv('usuarios.csv')
-
-    # 🔍 Buscar al usuario en la base de datos
     dfUsuario = dfusuarios[dfusuarios['usuario'] == usuario]
 
     if dfUsuario.empty:
@@ -93,9 +93,9 @@ def generarMenu(usuario):
 
         # 🔴 **Botón para cerrar sesión**
         if st.button("Salir"):
-            if os.path.exists(SESSION_FILE):
-                os.remove(SESSION_FILE)  # Borrar sesión
+            eliminar_sesion()  # Borra sesión
             st.rerun()
+
 
     # with st.sidebar:
 
