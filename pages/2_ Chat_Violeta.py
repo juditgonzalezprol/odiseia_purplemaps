@@ -1,6 +1,8 @@
 
 import streamlit as st
 from groq import Groq
+import pandas as pd
+
 
 st.set_page_config(page_title="Chat", page_icon="🟣", layout="wide")
 

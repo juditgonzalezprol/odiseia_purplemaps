@@ -1,7 +1,7 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium 
-
+import pandas as pd
 
 st.set_page_config(page_title="Puntos Violeta", page_icon="🟣", layout="wide")
 
@@ -132,7 +132,6 @@ with st.sidebar:
     # usuario = st.session_state["usuario"]
     # permisos = st.session_state["permisos"]
 
-    import pandas as pd
     st.image("img/Purple_Maps.png", width=100)
     # Cargamos la tabla de usuarios
     dfusuarios = pd.read_csv('usuarios.csv')
