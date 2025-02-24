@@ -1,188 +1,245 @@
 import streamlit as st
 import pandas as pd
-import folium
-from streamlit_folium import folium_static
 from datetime import datetime
 from geopy.geocoders import Nominatim
+import geocoder
+import folium
+from streamlit_folium import folium_static
 
-
-st.markdown(
-    """
+# **Configuración de estilos globales**
+st.markdown("""
     <style>
-        /* Fondo blanco */
+        * {
+            color: #db84fa !important;
+            font-family: 'Google Sans', sans-serif;
+        }
         .stApp {
-            background-color: #a9088e;
+            background-color: #ffffff !important;
         }
-        /* Centrar el contenido */
-        .container {
+
+        /* Borde del mapa en violeta */
+        .stDeckGlJsonChart, .folium-map {
+            border: 6px solid #db84fa !important;
+            border-radius: 15px !important;
+            padding: 5px !important;
+        }
+
+        /* Aumentar borde del formulario */
+        div.stForm {
+            border: 3px solid #db84fa !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+        }
+
+        /* Aumentar borde de las alertas recientes */
+        div.stExpander {
+            border: 2px solid #db84fa !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+        }
+
+        /* Campos de texto SIEMPRE con borde violeta */
+        div[data-baseweb="input"] {
+            border: 2px solid #db84fa !important;
+            border-radius: 6px !important;
+            padding: 8px !important;
+        }
+        div[data-baseweb="input"] input, 
+        textarea.stTextArea {
+            color: black !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Botones personalizados SOLO para "Usar mi ubicación actual" y "Enviar" */
+        div.stButton > button:first-of-type, /* Primer botón en la página */
+        div.stForm button {  /* Botón dentro de un formulario */
+            background-color: white !important;
+            color: #db84fa !important;
+            border: 2px solid #db84fa !important;
+            border-radius: 8px !important;
+            padding: 10px 15px !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease-in-out !important;
+            cursor: pointer !important;
+        }
+
+        /* Hover: Fondo violeta y letras blancas SOLO para "Usar mi ubicación actual" y "Enviar" */
+        div.stButton > button:first-of-type:hover,
+        div.stForm button:hover {
+            background-color: #db84fa !important;
+            color: black !important;
+        }
+
+        /* Estilos para los radio buttons */
+        div[data-baseweb="radio"] {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 90vh;
-            text-align: center;
+            gap: 15px;
         }
-        /* Estilo del título */
-        .title {
-            font-size: 40px;
+        div[data-baseweb="radio"] label {
+            background-color: #ffffff;
+            border: 2px solid #db84fa;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 16px;
             font-weight: bold;
-            color: #6a1b9a; /* Morado oscuro */
+            color: #db84fa !important;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
         }
-        /* Estilo del logo */
-        .logo {
-            width: 200px;
-            margin: 20px 0;
-        }
-        /* Caja de información */
-        .info-box {
-            background-color: #f3e5f5; /* Lila claro */
-            padding: 20px;
-            border-radius: 15px;
-            width: 60%;
-            font-size: 18px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /* Cambiar el fondo del sidebar a negro */
-        [data-testid="stSidebar"] {
-            background-color: #c39bd8 !important;
-        }
-        
-        /* Cambiar el color del texto en el sidebar a blanco */
-        [data-testid="stSidebar"] * {
+        div[data-baseweb="radio"] label:hover {
+            background-color: #db84fa;
             color: white !important;
         }
-
-        /* Centrar y poner margen al logo en el sidebar */
-        .sidebar-logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px 0;
-        }
-
-        /* Ajustar el tamaño del logo */
-        .sidebar-logo img {
-            width: 180px;
-        }
     </style>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
 
-# Inicializar geolocalizador
+# **Inicializar geolocalizador**
 geolocator = Nominatim(user_agent="streamlit_app")
 
-# Base de datos de alertas inventadas en el centro de Madrid
-initial_alerts = [
-    {"Descripción": "Incendio en un edificio", "Tipo": "Emergencia", "Ubicación": "Puerta del Sol, Madrid", "Fecha": "2025-02-21 10:00:00"},
-    {"Descripción": "Manifestación en la Gran Vía", "Tipo": "Advertencia", "Ubicación": "Gran Vía, Madrid", "Fecha": "2025-02-21 11:00:00"},
-    {"Descripción": "Corte de tráfico por obras", "Tipo": "Información", "Ubicación": "Plaza Mayor, Madrid", "Fecha": "2025-02-21 12:00:00"}
-]
+# **Función para cargar datos del CSV**
+@st.cache_data
+def load_data():
+    try:
+        return pd.read_csv("alertas.csv")
+    except FileNotFoundError:
+        return pd.DataFrame(columns=["tipo", "latitude", "longitude", "ubicación", "descripción", "status", "hora_envio"])
 
-# Simulación de almacenamiento de alertas (usando sesión para mantener datos temporalmente)
-if 'alerts' not in st.session_state:
-    st.session_state.alerts = initial_alerts
+# **Cargar alertas en sesión**
+if "alerts" not in st.session_state:
+    st.session_state.alerts = load_data()
 
-# Función para actualizar el mapa
+# **Mostrar Mapa con puntos de alerta y borde violeta**
+st.image("img/alertasyavisos.png", width=400)
+
+map_placeholder = st.empty()  # Contenedor para el mapa
+
 def generate_map():
     m = folium.Map(
         location=[40.4168, -3.7038],  # Ubicación centrada en Madrid
         zoom_start=12,
-        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        attr="© OpenStreetMap contributors, © CARTO"
+        tiles="CartoDB Positron"  # Mapa blanco minimalista
     )
-    for alert in st.session_state.alerts:
-        try:
-            location = geolocator.geocode(alert["Ubicación"])
-            if location:
-                folium.Marker(
-                    [location.latitude, location.longitude], 
-                    popup=f"{alert['Tipo']}: {alert['Descripción']}",
-                    icon=folium.Icon(color="purple", icon="info-sign")
-                ).add_to(m)
-        except:
-            pass  # Ignorar ubicaciones no válidas
+    for _, row in st.session_state.alerts.iterrows():
+        folium.CircleMarker(
+            location=[row["latitude"], row["longitude"]],
+            radius=10,  # Radio del punto de alerta
+            color="#db84fa",  # Borde violeta
+            fill=True,
+            fill_color="#db84fa",
+            fill_opacity=0.4,  # Transparencia del punto de alerta
+            popup=f"{row['tipo']}: {row['descripción']}"
+        ).add_to(m)
     return m
 
-
-# Mostrar el mapa justo debajo del logo
-st.image("img/alertasyavisos.png", width=150)
-map_placeholder = st.empty()
-map_placeholder.folium_static(generate_map())
-
-# Crear dos columnas
-col1, col2 = st.columns([1, 2])
-
-# Formulario para añadir una nueva alerta en la primera columna
-with col1:
-    st.header("🚨 Nueva Alerta")
-    with st.form("new_alert_form"):  # Fondo blanco
-        st.markdown("""
-            <style>
-                div.stForm { 
-                    background-color: white; 
-                    padding: 15px; 
-                    border-radius: 10px; 
-                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                }
-            </style>
-        """, unsafe_allow_html=True)
-        description = st.text_area("Descripción de la alerta")
-        alert_type = st.selectbox("Tipo de alerta", ["Emergencia", "Advertencia", "Información"])
-        location = st.text_input("Ubicación (Ciudad, Dirección, etc.)")
-        submitted = st.form_submit_button("Enviar Alerta")
-        
-        if submitted and description and alert_type and location:
-            new_alert = {
-                "Descripción": description,
-                "Tipo": alert_type,
-                "Ubicación": location,
-                "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
-            st.session_state.alerts.append(new_alert)
-            st.success("✅ Alerta enviada con éxito!")
-            map_placeholder.folium_static(generate_map())  # Recargar el mapa automáticamente
-
-# Mostrar alertas en forma de galería en la segunda columna
-with col2:
-    st.header("📌 Alertas Recientes")
-    if st.session_state.alerts:
-        st.markdown("""
-            <style>
-                div.alert-box {
-                    background-color: white;
-                    padding: 10px;
-                    border-radius: 10px;
-                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                    margin-bottom: 10px;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-        alerts_df = pd.DataFrame(st.session_state.alerts)
-        for index, row in alerts_df.iterrows():
-            with st.expander(f"🔔 {row['Tipo']} - {row['Ubicación']} ({row['Fecha']})"):
-                st.markdown("""
-                    <style>
-                        details {
-                            background-color: white;
-                            padding: 10px;
-                            border-radius: 10px;
-                            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                            margin-bottom: 10px;
-                        }
-                    </style>
-                """, unsafe_allow_html=True)
-                st.write(f"**Descripción:** {row['Descripción']}")
+with map_placeholder:
+    if not st.session_state.alerts.empty:
+        folium_static(generate_map())  # Renderiza el mapa con los puntos de alerta
     else:
-        st.info("No hay alertas disponibles. Sé el primero en reportar una!")
+        st.warning("No hay alertas disponibles para mostrar.")
+
+# **Obtener ubicación actual del usuario**
+def get_current_location():
+    g = geocoder.ip('me')  # Detectar ubicación por IP
+    if g.latlng:
+        latitude, longitude = g.latlng
+        location = geolocator.reverse((latitude, longitude), language="es")  # Convertir a dirección
+        return latitude, longitude, location.address if location else "Ubicación desconocida"
+    return None, None, "Ubicación no encontrada"
+
+# **Formulario para añadir alerta**
+st.header("🚨 Nueva Alerta")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    use_current_location = st.button("📍 Usar mi ubicación actual")
+
+with col2:
+    manual_location = st.text_input("📌 O ingresar una dirección manual")
+
+latitude, longitude, location_name = None, None, None
+
+if use_current_location:
+    latitude, longitude, location_name = get_current_location()
+    if latitude and longitude:
+        st.success(f"Ubicación detectada: {location_name}")
+    else:
+        st.error("⚠️ No se pudo obtener la ubicación actual.")
+
+if manual_location:
+    location = geolocator.geocode(manual_location)
+    if location:
+        latitude, longitude, location_name = location.latitude, location.longitude, location.address
+        st.success(f"Dirección detectada: {location_name}")
+    else:
+        st.error("⚠️ No se pudo obtener la ubicación de la dirección ingresada.")
+
+# **Formulario**
+with st.form("new_alert_form"):
+    description = st.text_area("Descripción de la alerta")
+    alert_type = st.selectbox("Tipo de alerta", ["Emergencia", "Advertencia", "Información", "Acoso Callejero"])
+    
+    submitted = st.form_submit_button("Enviar Alerta")
+
+    if submitted and description:
+        if latitude is not None and longitude is not None:
+            new_alert = {
+                "tipo": alert_type,
+                "latitude": latitude,
+                "longitude": longitude,
+                "ubicación": location_name,
+                "descripción": description,
+                "status": "activa",
+                "hora_envio": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            # **Actualizar estado en sesión**
+            st.session_state.alerts = pd.concat([st.session_state.alerts, pd.DataFrame([new_alert])], ignore_index=True)
+            # **Guardar en CSV**
+            st.session_state.alerts.to_csv("alertas.csv", index=False)
+            # **Actualizar el mapa**
+            with map_placeholder:
+                folium_static(generate_map())  # Recargar mapa con la nueva alerta
+            st.success("✅ Alerta enviada con éxito!")
+        else:
+            st.error("⚠️ Debes seleccionar una ubicación antes de enviar la alerta.")
+
+# **Filtro para mostrar solo alertas activas o inactivas con botones**
+st.header("📌 Alertas Recientes")
+
+# Agregar radio buttons para filtrar entre alertas activas o inactivas
+status_filter = st.radio(
+    "Filtrar alertas por estado:", 
+    ["Todas", "Activas", "Inactivas"], 
+    horizontal=True  # 🔹 Esto hace que los botones estén en línea
+)
+
+# Aplicar el filtro sobre las alertas
+if status_filter == "Activas":
+    filtered_alerts = st.session_state.alerts[st.session_state.alerts["status"] == "activa"]
+elif status_filter == "Inactivas":
+    filtered_alerts = st.session_state.alerts[st.session_state.alerts["status"] == "inactiva"]
+else:
+    filtered_alerts = st.session_state.alerts  # Mostrar todas las alertas
+
+# **Mostrar alertas filtradas**
+if not filtered_alerts.empty:
+    for _, row in filtered_alerts.iterrows():
+        with st.expander(f"🔔 {row['tipo']} - ({row['hora_envio']})"):
+            st.write(f"**Descripción:** {row['descripción']}")
+            st.write(f"📍 **Ubicación:** {row['ubicación']}")
+            st.write(f"📌 **Estado:** {row['status'].capitalize()}")
+else:
+    st.info("No hay alertas disponibles en este estado.")
 
 
 with st.sidebar:
 
     usuario = st.session_state["usuario"]
     permisos = st.session_state["permisos"]
-
 
     import pandas as pd
     st.image("img/Purple_Maps.png", width=100)

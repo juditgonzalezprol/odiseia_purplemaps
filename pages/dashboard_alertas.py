@@ -19,7 +19,7 @@ st.markdown(
     """
     <style>
         .stApp { background-color: white; }
-        .st-emotion-cache-janbn0 { background-color: #f3e5f5 !important; }
+        .st-emotion-cache-janbn0 { background-color: #db84fa !important; }
         [data-testid="stSidebar"] { background-color: #222 !important; }
         [data-testid="stSidebar"] * { color: white !important; }
 

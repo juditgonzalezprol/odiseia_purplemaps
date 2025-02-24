@@ -33,7 +33,7 @@ st.markdown(
         }
         /* Caja de información */
         .info-box {
-            background-color: #f3e5f5; /* Lila claro */
+            background-color: #db84fa; /* Lila claro */
             padding: 20px;
             border-radius: 15px;
             width: 60%;

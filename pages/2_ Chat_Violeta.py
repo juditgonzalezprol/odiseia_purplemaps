@@ -12,6 +12,9 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 st.markdown(
     """
     <style>
+        * {
+            font-family: 'Google Sans', sans-serif;
+        }
         /* Fondo blanco */
         .stApp {
             background-color: white;

@@ -3,6 +3,7 @@ import pandas as pd
 
 # Validación simple de usuario y clave con un archivo csv
 
+
 def validarUsuario(usuario, clave):    
     """Permite la validación de usuario y clave
     
@@ -48,11 +49,12 @@ def generarMenu(usuario):
         #Mostramos el nombre del usuario
         st.write(f"Hola **:blue-background[{nombre}]** ")
         # Mostramos los enlaces de páginas
-        st.subheader("Servicios")
+        st.subheader("Funcionalidades")
         st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
         st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
         st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
         if permisos == "administradora":
+            st.subheader("Gestión y administración")
             st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
     
         st.session_state["usuario"] = usuario
@@ -66,7 +68,23 @@ def generarMenu(usuario):
             st.rerun()
 
 def generarLogin():
-    st.image("img/pulpleblanco.png", width=500)
+    
+    st.markdown(
+        """
+        <style>
+            * {
+                font-family: 'Google Sans', sans-serif;
+            }
+
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    col1, col2, col3 = st.columns([1, 2, 1])  # Columnas para centrar la imagen
+    with col2:  # Columna central
+        st.image("img/purple_blanco_PNG.png", width=500)
+
     """Genera la ventana de login o muestra el menú si el login es valido
     """    
     # Validamos si el usuario ya fue ingresado    
@@ -79,7 +97,7 @@ def generarLogin():
             <style>
                 /* Fondo general de la aplicación */
                 .stApp {
-                    background-color: #cb6ce6; /* Color lila claro */
+                    background-color: #c39bd8; /* Color lila claro */
                 }
 
                 /* Estilo del formulario */
@@ -93,19 +111,9 @@ def generarLogin():
                     text-align: center;
                 }
 
-                /* Campos de entrada */
-                input[type="text"], input[type="password"] {
-                    background-color: #f3e5f5;
-                    border: 1px solid #6a1b9a;
-                    color: #4a148c;
-                    padding: 10px;
-                    border-radius: 5px;
-                    width: 100%;
-                }
-
                 /* Botón de ingreso */
                 div[data-testid="stFormSubmitButton"] button {
-                    background-color: #cb6ce6 !important;
+                    background-color: #c39bd8 !important;
                     color: white !important;
                     border-radius: 8px !important;
                     padding: 10px !important;
@@ -124,19 +132,20 @@ def generarLogin():
 
                 /* Campos de entrada (usuario y contraseña) */
                 input[type="text"], input[type="password"] {
-                    background-color: #f3e5f5;
+                    background-color: #c39bd8;
                     border: 2px solid #6a1b9a;  /* Borde violeta normal */
-                    color: #4a148c;
+                    color: white !important;  /* 🔹 Texto en blanco */
                     padding: 10px;
                     border-radius: 5px;
                     width: 100%;
                     outline: none; /* Elimina el borde azul predeterminado */
                 }
 
+
                 /* Cambio de borde al seleccionar el campo */
                 input[type="text"]:focus, input[type="password"]:focus {
-                    border: 2px solid #cb6ce6 !important; /* Borde violeta claro al enfocar */
-                    box-shadow: 0px 0px 8px #cb6ce6 !important; /* Efecto de brillo violeta */
+                    border: 2px solid #db84fa !important; /* Borde violeta claro al enfocar */
+                    box-shadow: 0px 0px 8px #db84fa !important; /* Efecto de brillo violeta */
                     outline: none !important;
                 }
 
@@ -154,4 +163,62 @@ def generarLogin():
                     st.session_state['usuario'] =parUsuario
                     st.rerun()
                 else:
-                    st.error("Usuario o clave inválidos",icon=":material/gpp_maybe:")                    
+                    st.error("Usuario o clave inválidos",icon=":material/gpp_maybe:")      
+
+        # Crear columnas para alinear los botones en fila
+        # Aplicar estilos personalizados con CSS para los botones
+        st.markdown(
+            """
+            <style>
+                /* Contenedor de los botones de registro */
+                .registro-container {
+                    display: flex;
+                    width: 200px;  /* Mismo ancho que el formulario */
+                    margin: auto;
+                }
+
+                /* Estilos generales para los botones */
+                .registro-btn {
+                    background-color: #c39bd8 !important;
+                    color: white !important;
+                    border: 2px solid white !important;
+                    border-radius: 8px !important;
+                    padding: 10px !important;
+                    width: 30% !important; /* Distribuir los botones equitativamente */
+                    font-size: 14px !important;
+                    font-weight: bold !important;
+                    text-align: center !important;
+                    cursor: pointer !important;
+                    transition: 0.3s !important;
+                }
+
+                /* Hover: Fondo violeta más oscuro */
+                .registro-btn:hover {
+                    background-color: #a26bcf !important;
+                    border-color: #ffffff !important;
+                }
+
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Crear un contenedor para alinear los botones en fila
+        col1, col2, col3 = st.columns(3)
+
+        # Botón 1: Registrarse con DNI-Electrónico
+        with col1:
+            if st.button("🆔 DNI-Electrónico", key="dni", help="Registrarse con DNI-Electrónico"):
+                st.success("Registro con DNI-Electrónico seleccionado")
+
+        # Botón 2: Registrarse con Clave365
+        with col2:
+            if st.button("🔑 Clave365", key="clave365", help="Registrarse con Clave365"):
+                st.success("Registro con Clave365 seleccionado")
+
+        # Botón 3: Registrarse con otro método
+        with col3:
+            if st.button("📄 Otro Método", key="otro", help="Registrarse con otro método"):
+                st.success("Registro con otro método seleccionado")
+
+              
