@@ -119,15 +119,21 @@ st_folium(m, width=1050, height=550)
 with st.sidebar:
 
     usuario = st.session_state.get("usuario", None)
+    permisos = st.session_state.get("permisos", "Usuaria")  # Valor por defecto si no existe
+
 
     dfusuarios = pd.read_csv('usuarios.csv')
+
+    # Filtrar usuario
     dfUsuario = dfusuarios[dfusuarios['usuario'] == usuario]
-    
+
+    # ✅ Verificar si dfUsuario no está vacío antes de acceder a valores
     if not dfUsuario.empty:
-        nombre = dfUsuario['nombre'].values[0]
-        permisos = dfUsuario['permisos'].values[0]
+        nombre = dfUsuario.iloc[0]["nombre"]  # Acceder a la primera fila de forma segura
+        permisos = dfUsuario.iloc[0]["permisos"]
     else:
         nombre = "Invitada"
+        permisos = "Usuaria"
 
     # usuario = st.session_state["usuario"]
     # permisos = st.session_state["permisos"]
