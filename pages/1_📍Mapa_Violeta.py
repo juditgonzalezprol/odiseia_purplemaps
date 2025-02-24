@@ -118,8 +118,19 @@ st_folium(m, width=1050, height=550)
 
 with st.sidebar:
 
-    usuario = st.session_state["usuario"]
-    permisos = st.session_state["permisos"]
+    usuario = st.session_state.get("usuario", None)
+
+    dfusuarios = pd.read_csv('usuarios.csv')
+    dfUsuario = dfusuarios[dfusuarios['usuario'] == usuario]
+    
+    if not dfUsuario.empty:
+        nombre = dfUsuario['nombre'].values[0]
+        permisos = dfUsuario['permisos'].values[0]
+    else:
+        nombre = "Invitada"
+
+    # usuario = st.session_state["usuario"]
+    # permisos = st.session_state["permisos"]
 
     import pandas as pd
     st.image("img/Purple_Maps.png", width=100)
