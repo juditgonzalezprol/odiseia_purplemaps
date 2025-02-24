@@ -119,12 +119,16 @@ with st.sidebar:
     #Mostramos el nombre del usuario
     st.write(f"Hola **:blue-background[{nombre}]** ")
     # Mostramos los enlaces de páginas
-    st.subheader("Servicios")
+    st.subheader("Funcionalidades")
     st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
     st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
     st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
     if permisos == "administradora":
+        st.subheader("Gestión y administración")
         st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
+
+    st.session_state["usuario"] = usuario
+    st.session_state["permisos"] = permisos  # Guardar permisos globalmen
 
     # Botón para cerrar la sesión
     btnSalir=st.button("Salir")

@@ -7,9 +7,35 @@ st.set_page_config(page_title="Puntos Violeta", page_icon="🟣", layout="wide")
 st.markdown(
     """
     <style>
+
+        * {
+            font-family: 'Google Sans', sans-serif;
+        }
         /* Fondo blanco */
         .stApp {
-            background-color: #a9088e;
+            background-color: white;
+        }
+        /* Cambiar el fondo del sidebar a negro */
+        [data-testid="stSidebar"] {
+            background-color: #c39bd8 !important;
+        }
+        
+        /* Cambiar el color del texto en el sidebar a blanco */
+        [data-testid="stSidebar"] * {
+            color: white !important;
+        }
+
+        /* Centrar y poner margen al logo en el sidebar */
+        .sidebar-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        /* Ajustar el tamaño del logo */
+        .sidebar-logo img {
+            width: 180px;
         }
         /* Centrar el contenido */
         .container {
@@ -106,12 +132,16 @@ with st.sidebar:
     #Mostramos el nombre del usuario
     st.write(f"Hola **:blue-background[{nombre}]** ")
     # Mostramos los enlaces de páginas
-    st.subheader("Servicios")
+    st.subheader("Funcionalidades")
     st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
     st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
     st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
     if permisos == "administradora":
+        st.subheader("Gestión y administración")
         st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
+
+    st.session_state["usuario"] = usuario
+    st.session_state["permisos"] = permisos  # Guardar permisos globalmen
 
     # Botón para cerrar la sesión
     btnSalir=st.button("Salir")
