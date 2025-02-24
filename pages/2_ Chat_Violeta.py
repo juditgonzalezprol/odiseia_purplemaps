@@ -1,7 +1,6 @@
 
 import streamlit as st
 from groq import Groq
-from PyPDF2 import PdfReader
 
 st.set_page_config(page_title="Chat", page_icon="🟣", layout="wide")
 
@@ -19,6 +18,29 @@ st.markdown(
         .stApp {
             background-color: white;
         }
+                /* Cambiar el fondo del sidebar a negro */
+        [data-testid="stSidebar"] {
+            background-color: #c39bd8 !important;
+        }
+        
+        /* Cambiar el color del texto en el sidebar a blanco */
+        [data-testid="stSidebar"] * {
+            color: white !important;
+        }
+
+        /* Centrar y poner margen al logo en el sidebar */
+        .sidebar-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        /* Ajustar el tamaño del logo */
+        .sidebar-logo img {
+            width: 180px;
+        }
+
         /* Centrar el contenido */
         .container {
             display: flex;
@@ -47,28 +69,6 @@ st.markdown(
             width: 60%;
             font-size: 18px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /* Cambiar el fondo del sidebar a negro */
-        [data-testid="stSidebar"] {
-            background-color: #c39bd8 !important;
-        }
-        
-        /* Cambiar el color del texto en el sidebar a blanco */
-        [data-testid="stSidebar"] * {
-            color: white !important;
-        }
-
-        /* Centrar y poner margen al logo en el sidebar */
-        .sidebar-logo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px 0;
-        }
-
-        /* Ajustar el tamaño del logo */
-        .sidebar-logo img {
-            width: 180px;
         }
 
         .st-emotion-cache-janbn0 {
