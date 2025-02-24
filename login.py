@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 
 # Validación simple de usuario y clave con un archivo csv
 
@@ -34,38 +35,101 @@ def generarMenu(usuario):
     Args:
         usuario (str): usuario utilizado para generar el menú
     """
-          
-    with st.sidebar:
 
-        import pandas as pd
+    st.set_page_config(page_title="Puntos Violeta", page_icon="🟣", layout="wide")
+
+    # 📌 Archivo donde se guarda la sesión del usuario
+    SESSION_FILE = "session.txt"
+
+    # 🔄 **Al iniciar la app, eliminar la sesión anterior**
+    if os.path.exists(SESSION_FILE):
+        os.remove(SESSION_FILE)
+
+    # 📝 **Función para guardar el usuario en archivo**
+    def guardar_sesion(usuario, permisos):
+        with open(SESSION_FILE, "w") as f:
+            f.write(f"{usuario}\n{permisos}")
+
+    # 📂 **Función para cargar la sesión desde archivo**
+    def cargar_sesion():
+        if os.path.exists(SESSION_FILE):
+            with open(SESSION_FILE, "r") as f:
+                lines = f.readlines()
+                if len(lines) >= 2:
+                    return lines[0].strip(), lines[1].strip()  # Retorna usuario y permisos
+        return None, None  # Si no hay sesión, retorna None
+
+    # 🟣 **Verificar si hay usuario logueado**
+    usuario, permisos = cargar_sesion()
+
+    if usuario is None:
+        st.warning("⚠️ No has iniciado sesión. Redirigiendo al login...")
+        st.stop()  # Detiene la ejecución para evitar errores
+
+    # 📌 Cargar la tabla de usuarios desde CSV
+    dfusuarios = pd.read_csv('usuarios.csv')
+
+    # 🔍 Buscar al usuario en la base de datos
+    dfUsuario = dfusuarios[dfusuarios['usuario'] == usuario]
+
+    if dfUsuario.empty:
+        nombre = "Invitada"
+        permisos = "Usuaria"
+    else:
+        nombre = dfUsuario.iloc[0]["nombre"]
+        permisos = dfUsuario.iloc[0]["permisos"]
+
+    # 🔹 **SIDEBAR**
+    with st.sidebar:
         st.image("img/Purple_Maps.png", width=100)
-        # Cargamos la tabla de usuarios
-        dfusuarios = pd.read_csv('usuarios.csv')
-        # Filtramos la tabla de usuarios
-        dfUsuario =dfusuarios[(dfusuarios['usuario']==usuario)]
-        # Cargamos el nombre del usuario
-        nombre= dfUsuario['nombre'].values[0]
-        permisos= dfUsuario['permisos'].values[0]
-        #Mostramos el nombre del usuario
         st.write(f"Hola **:blue-background[{nombre}]** ")
-        # Mostramos los enlaces de páginas
+
         st.subheader("Funcionalidades")
         st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
         st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
         st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
+
         if permisos == "administradora":
             st.subheader("Gestión y administración")
             st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
-    
-        st.session_state["usuario"] = usuario
-        st.session_state["permisos"] = permisos  # Guardar permisos globalmen
 
-        # Botón para cerrar la sesión
-        btnSalir=st.button("Salir")
-        if btnSalir:
-            st.session_state.clear()
-            # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
+        # 🔴 **Botón para cerrar sesión**
+        if st.button("Salir"):
+            if os.path.exists(SESSION_FILE):
+                os.remove(SESSION_FILE)  # Borrar sesión
             st.rerun()
+
+    # with st.sidebar:
+
+    #     import pandas as pd
+    #     st.image("img/Purple_Maps.png", width=100)
+    #     # Cargamos la tabla de usuarios
+    #     dfusuarios = pd.read_csv('usuarios.csv')
+    #     # Filtramos la tabla de usuarios
+    #     dfUsuario =dfusuarios[(dfusuarios['usuario']==usuario)]
+    #     # Cargamos el nombre del usuario
+    #     nombre= dfUsuario['nombre'].values[0]
+    #     permisos= dfUsuario['permisos'].values[0]
+    #     #Mostramos el nombre del usuario
+    #     st.write(f"Hola **:blue-background[{nombre}]** ")
+    #     # Mostramos los enlaces de páginas
+    #     st.subheader("Funcionalidades")
+    #     st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
+    #     st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
+    #     st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
+    #     if permisos == "administradora":
+    #         st.subheader("Gestión y administración")
+    #         st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
+    
+    #     st.session_state["usuario"] = usuario
+    #     st.session_state["permisos"] = permisos  # Guardar permisos globalmen
+
+    #     # Botón para cerrar la sesión
+    #     btnSalir=st.button("Salir")
+    #     if btnSalir:
+    #         st.session_state.clear()
+    #         # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
+    #         st.rerun()
 
 def generarLogin():
     
