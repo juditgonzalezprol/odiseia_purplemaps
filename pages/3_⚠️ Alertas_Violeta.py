@@ -173,7 +173,7 @@ def get_current_location():
     return None, None, "Ubicación no encontrada"
 
 # **Formulario para añadir alerta**
-st.header("🚨 Nueva Alerta")
+st.image("img/nueva_alerta.png", width=250)
 
 col1, col2 = st.columns(2)
 
@@ -230,7 +230,7 @@ with st.form("new_alert_form"):
             st.error("⚠️ Debes seleccionar una ubicación antes de enviar la alerta.")
 
 # **Filtro para mostrar solo alertas activas o inactivas con botones**
-st.header("📌 Alertas Recientes")
+st.image("img/consullta_alertas_recientes.png", width=500)
 
 # Agregar radio buttons para filtrar entre alertas activas o inactivas
 status_filter = st.radio(

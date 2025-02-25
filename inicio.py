@@ -1,5 +1,5 @@
 import streamlit as st
-import login as login
+import login
 import pandas as pd
 from groq import Groq 
 
@@ -182,3 +182,38 @@ if 'usuario' in st.session_state:
                 <p style="color: #a9088e; font-weight: bold;">{st.session_state['alert_summary']}</p>
             </div>
         """, unsafe_allow_html=True)
+        
+    with st.sidebar:
+
+        usuario = st.session_state["usuario"]
+        permisos = st.session_state["permisos"]
+
+        import pandas as pd
+        st.image("img/Purple_Maps.png", width=100)
+        # Cargamos la tabla de usuarios
+        dfusuarios = pd.read_csv('usuarios.csv')
+        # Filtramos la tabla de usuarios
+        dfUsuario =dfusuarios[(dfusuarios['usuario']==usuario)]
+        # Cargamos el nombre del usuario
+        nombre= dfUsuario['nombre'].values[0]
+        permisos= dfUsuario['permisos'].values[0]
+        #Mostramos el nombre del usuario
+        st.write(f"Hola **:blue-background[{nombre}]** ")
+        # Mostramos los enlaces de páginas
+        st.subheader("Funcionalidades")
+        st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
+        st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
+        st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
+        if permisos == "administradora":
+            st.subheader("Gestión y administración")
+            st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
+
+        st.session_state["usuario"] = usuario
+        st.session_state["permisos"] = permisos  # Guardar permisos globalmen
+
+        # Botón para cerrar la sesión
+        btnSalir=st.button("Salir")
+        if btnSalir:
+            st.session_state.clear()
+            # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
+            st.rerun()

@@ -227,8 +227,24 @@ info_añadida = """    Guía de Actuación ante la Violencia Machista
 
 # st.markdown('<div><h1 class="Chat Punto Violeta" style="color: white;">Chat Violeta</h1></div>', unsafe_allow_html=True)
 
-st.image("img/chatvioleta.png", width=500)
 
+st.image("img/chatvioleta.png", width=500)
+# cols = st.columns([4, 1])
+# with cols[0]:
+#     st.image("img/chatvioleta.png", width=500)
+# with cols[1]:
+#     # Convertir los mensajes del chat a un CSV; si no hay mensajes, se genera un CSV con encabezados
+#     if st.session_state.messages:
+#         df_chat = pd.DataFrame(st.session_state.messages)
+#         csv_data = df_chat.to_csv(index=False).encode('utf-8')
+#     else:
+#         csv_data = "role,content\n".encode("utf-8")
+#     st.download_button(
+#         label="Guardar Chat",
+#         data=csv_data,
+#         file_name="chat.csv",
+#         mime="text/csv"
+#     )
 
 # 🔹 Inicializar variables en `st.session_state`
 if "groq_model" not in st.session_state:

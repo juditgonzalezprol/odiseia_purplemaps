@@ -8,3 +8,5 @@ plotly
 streamlit-autorefresh
 twilio
 geocoder
+config
+serpapi

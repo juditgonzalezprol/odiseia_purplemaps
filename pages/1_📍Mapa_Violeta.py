@@ -2,6 +2,8 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium 
 import pandas as pd
+import plotly.express as px
+from geopy.geocoders import Nominatim
 
 st.set_page_config(page_title="Puntos Violeta", page_icon="🟣", layout="wide")
 
@@ -94,8 +96,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.image("img/searchmap.png", width=500)
-
+st.image("img/purplemapsearch.png", width=500)
 
 # Crear el mapa con un estilo blanco minimalista (CartoDB Positron)
 m = folium.Map(
@@ -105,16 +106,51 @@ m = folium.Map(
     attr="© OpenStreetMap contributors, © CARTO"
 )
 
-# Agregar un marcador de ejemplo en Madrid
-folium.Marker(
-    [40.4168, -3.7038], 
-    popup="Punto Violeta en Madrid", 
-    tooltip="Haz clic para más info",
-    icon=folium.Icon(color="purple")
-).add_to(m)
+# Leer los puntos desde un archivo CSV
+df = pd.read_csv("puntos.csv")
+
+# Iterar sobre cada fila del DataFrame y agregar un marcador con enlace en el popup
+for index, row in df.iterrows():
+    lat = row["latitud"]
+    lon = row["longitud"]
+    # Se obtiene el texto del popup o se asigna un valor por defecto
+    popup_text = row["popup"] if "popup" in row else "Punto Violeta"
+    tooltip_text = row["tooltip"] if "tooltip" in row else "Haz clic para más info"
+    
+    # Crear enlace HTML para el popup que abra Google Maps en otra pestaña
+    html = f'<a href="https://www.google.com/maps?q={lat},{lon}" target="_blank">{popup_text}</a>'
+    popup = folium.Popup(html, max_width=300)
+    
+    # Agregar el marcador con el popup y el tooltip definidos
+    folium.Marker(
+        [lat, lon],
+        popup=popup,
+        tooltip=tooltip_text,
+        icon=folium.Icon(color="purple")
+    ).add_to(m)
 
 # Mostrar el mapa en Streamlit
-st_folium(m, width=1050, height=550)
+st_folium(m, width=1500, height=550)
+
+st.markdown(
+    """
+    <style>
+        * { font-family: 'Google Sans', sans-serif; }
+        .stApp { background-color: white; }
+        [data-testid="stSidebar"] { background-color: #c39bd8 !important; }
+        [data-testid="stSidebar"] * { color: white !important; }
+        .sidebar-logo { display: flex; justify-content: center; align-items: center; padding: 20px 0; }
+        .sidebar-logo img { width: 180px; }
+        .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; text-align: center; }
+        .title { font-size: 40px; font-weight: bold; color: #6a1b9a; }
+        .logo { width: 200px; margin: 20px 0; }
+        .info-box { background-color: #db84fa; padding: 20px; border-radius: 15px; width: 60%; font-size: 18px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.image("img/purplemapsearch.png", width=500)
 
 with st.sidebar:
 
@@ -150,9 +186,12 @@ with st.sidebar:
     st.write(f"Hola **:blue-background[{nombre}]** ")
     # Mostramos los enlaces de páginas
     st.subheader("Funcionalidades")
+    st.page_link("inicio.py", label="Inicio", icon=":material/home:")
     st.page_link("pages/1_📍Mapa_Violeta.py", label="Mapa Violeta", icon=":material/home_pin:")
     st.page_link("pages/2_ Chat_Violeta.py", label="Chat Violeta", icon=":material/chat:")
     st.page_link("pages/3_⚠️ Alertas_Violeta.py", label="Alertas ", icon=":material/report:")
+    st.page_link("pages/info.py", label="Info y documentación", icon=":material/contact_support:")
+    st.page_link("pages/forms_peticiones.py", label="Solicitud de PV", icon=":material/contact_page:")
     if permisos == "administradora":
         st.subheader("Gestión y administración")
         st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
