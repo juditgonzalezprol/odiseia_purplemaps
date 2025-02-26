@@ -165,7 +165,8 @@ with st.sidebar:
         if permisos == "administradora":
             st.subheader("Gestión y administración")
             st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
-            st.page_link("pages/modelo_optimizacion.py", label="Algoritmo Optimización", icon=":material/modeling:")
+            st.page_link("pages/modelo_optimizacion_estatal.py", label="Modelo Optimización Estatal", icon=":material/modeling:")
+            st.page_link("pages/modelo_optimizacion_local.py", label="Modelo Optimización Local", icon=":material/modeling:")
 
         st.session_state["usuario"] = usuario
         st.session_state["permisos"] = permisos  # Guardar permisos globalmen
@@ -295,7 +296,7 @@ if "messages" not in st.session_state:
 model = st.session_state["groq_model"]
 
 # Ejemplo de uso en una llamada a la API
-st.write(f"Usando el modelo: {model}")
+st.write(f"Usando el modelo: {model}. Recuerda que esto es un chat generado por inteligencia artificial.")
 
 # Mostrar mensajes anteriores
 for message in st.session_state.messages:

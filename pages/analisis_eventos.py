@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
+from serpapi import GoogleSearch
 
-st.set_page_config(page_title="Puntos Violeta", page_icon="🟣", layout="wide")
+st.set_page_config(page_title="Análisis de tendencias", page_icon="🟣", layout="wide")
 
 st.markdown(
     """
@@ -68,6 +69,23 @@ st.markdown(
 
 with st.sidebar:
 
+        st.markdown(
+            """
+            <style>
+                /* Cambiar el fondo del sidebar a morado claro */
+                [data-testid="stSidebar"] {
+                    background-color: #c39bd8 !important;
+                }
+                
+                /* Cambiar el color del texto en el sidebar a blanco */
+                [data-testid="stSidebar"] * {
+                    color: white !important;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
 
         usuario = st.session_state.get("usuario", None)
         permisos = st.session_state.get("permisos", "Usuaria")  # Valor por defecto si no existe
@@ -110,7 +128,8 @@ with st.sidebar:
         if permisos == "administradora":
             st.subheader("Gestión y administración")
             st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
-            st.page_link("pages/modelo_optimizacion.py", label="Algoritmo Optimización", icon=":material/modeling:")
+            st.page_link("pages/modelo_optimizacion_estatal.py", label="Modelo Optimización Estatal", icon=":material/modeling:")
+            st.page_link("pages/modelo_optimizacion_local.py", label="Modelo Optimización Local", icon=":material/modeling:")
 
         st.session_state["usuario"] = usuario
         st.session_state["permisos"] = permisos  # Guardar permisos globalmen
@@ -121,3 +140,51 @@ with st.sidebar:
             st.session_state.clear()
             # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
             st.rerun()
+            
+import streamlit as st
+from serpapi import GoogleSearch
+
+# Título de la aplicación
+st.image("img/analisis.png", width=500)
+
+# API Key de SerpApi (reemplázala con tu clave real)
+API_KEY = "596f9ae7b1bd024900ced0189a2c07e3210b9f24e8cc3098176870aa480b8037"
+
+# Entrada del usuario
+st.header("🔍 Parámetros de búsqueda")
+ciudad = st.text_input("Introduce el municipio/ciudad/zona", "Madrid")
+evento = st.text_input("Introduce el tipo de evento (ej. festival, concierto, feria)", "festival, fiesta")
+
+# Botón de búsqueda
+if st.button("Buscar eventos"):
+    # Definir la consulta
+    query = f"{evento} en {ciudad}"
+
+    # Parámetros de búsqueda
+    params = {
+        "engine": "google_news",
+        "hl": "es",
+        "gl": "es",
+        "q": query,
+        "api_key": API_KEY
+    }
+
+    # Ejecutar la búsqueda
+    st.write(f"🔍 Buscando noticias sobre **{evento}** en **{ciudad}**...")
+    search = GoogleSearch(params)
+    results = search.get_dict()
+
+    # Mostrar resultados
+    if "news_results" in results:
+        for i, news in enumerate(results["news_results"], start=1):
+            st.subheader(f"{i}. {news['title']}")
+            st.write(f"📰 Fuente: {news.get('source', 'Desconocida')}")
+            st.write(f"📅 Fecha: {news.get('date', 'No disponible')}")
+            st.write(f"[Leer más]({news['link']})")
+            st.write("---")
+    else:
+        st.error("❌ No se encontraron noticias.")
+
+# Nota: Para ejecutar esta aplicación, instala Streamlit y la API de SerpApi con:
+# pip install streamlit go
+

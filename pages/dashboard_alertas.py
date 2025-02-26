@@ -25,7 +25,7 @@ st.markdown(
         .stApp {
             background-color: white;
         }
-                /* Cambiar el fondo del sidebar a negro */
+        /* Cambiar el fondo del sidebar a negro */
         [data-testid="stSidebar"] {
             background-color: #c39bd8 !important;
         }
@@ -78,18 +78,15 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Carga de datos desde un archivo local **sin caché**
 def cargar_datos():
     return pd.read_csv('alertas.csv', parse_dates=['hora_envio'])
 
 df_alertas = cargar_datos()
 
-# Creación de columnas para dividir la pantalla
-c1, c2 = st.columns([1.4, 1], gap= "large")  # Ajuste para hacer el mapa más grande y la tabla más pequeña
+c1, c2 = st.columns([1.4, 1], gap= "large")  
 
-# 📍 **Mapa interactivo con fondo blanco y zoom más alejado**
 with c1:
-    st.subheader("📍 Ubicación de Alertas")
+    st.image("img/alertasyavisos.png", width=300)
 
     fig_mapa = px.scatter_mapbox(
         df_alertas,
@@ -105,19 +102,17 @@ with c1:
     )
 
     fig_mapa.update_layout(
-        mapbox_style="carto-positron",  # Fondo blanco minimalista
+        mapbox_style="carto-positron",
         margin=dict(l=0, r=0, t=0, b=0)
     )
 
     st.plotly_chart(fig_mapa, use_container_width=True)
 
-# 📊 **Tabla de alertas con filtro y tamaño reducido**
 with c2:
     
     df_alertas['hora'] = df_alertas['hora_envio'].dt.hour
     df_alertas_hora = df_alertas.groupby('hora').size().reset_index(name='cantidad')
 
-    # Gráfico de alertas por hora con fondo blanco y borde violeta
     fig_alertas_hora = px.line(
         df_alertas_hora,
         x='hora',
@@ -136,42 +131,33 @@ with c2:
         yaxis=dict(showgrid=True, gridcolor="lightgray")
     )
 
-    # Mostrar gráfico con estilo **SIN caché**
     with st.container():
-        st.markdown('<div class="stPlotlyChart">', unsafe_allow_html=True)
+        st.image("img/alertas_por_hora.png", width=300)
         st.plotly_chart(fig_alertas_hora, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 
-
-
 df_alertas = pd.DataFrame(df_alertas)
 
-# 🔥 Función para cambiar el color del texto a violeta
 def color_violet_text(col):
     return ['color: #6a1b9a; font-weight: bold' for _ in col]
 
-# 🔥 Función para el fondo blanco
 def background_white(col):
     return ['background-color: white' for _ in col]
 
-# 🔥 Función para hover: fondo violeta y letras blancas
 def hover_effect(col):
     return ['background-color: #6a1b9a; color: white' for _ in col]
 
-# 🔥 Estilos para los encabezados
 header_styles = [
     {'selector': 'th', 'props': [('background-color', 'white'), ('color', 'black'), ('font-weight', 'bold')]}
 ]
 
-# Aplicamos estilos con `pandas Styler`
 styled_df = (df_alertas.style
             .apply(background_white, subset=df_alertas.columns)  # Fondo blanco
             .apply(color_violet_text, subset=df_alertas.columns)  # Texto violeta
             .set_table_styles(header_styles)  # Estilos de encabezado
             )
 
-# st.table(styled_df)
 st.image("img/alertas_en_tiempo_real.png", width=500)
 st.dataframe(styled_df)
 
@@ -236,7 +222,8 @@ with st.sidebar:
         if permisos == "administradora":
             st.subheader("Gestión y administración")
             st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
-            st.page_link("pages/modelo_optimizacion.py", label="Algoritmo Optimización", icon=":material/modeling:")
+            st.page_link("pages/modelo_optimizacion_estatal.py", label="Modelo Optimización Estatal", icon=":material/modeling:")
+            st.page_link("pages/modelo_optimizacion_local.py", label="Modelo Optimización Local", icon=":material/modeling:")
 
         st.session_state["usuario"] = usuario
         st.session_state["permisos"] = permisos  # Guardar permisos globalmen
