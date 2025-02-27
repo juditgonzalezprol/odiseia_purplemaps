@@ -76,16 +76,26 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Título
 
 # API Key de SerpApi (reemplázala con la tuya)
 API_KEY = "596f9ae7b1bd024900ced0189a2c07e3210b9f24e8cc3098176870aa480b8037"
-ubicacion = "@40.417031, -3.683458,14z"
+
+col1, col2 = st.columns(2)
+
+with col1:
+    lat = st.text_input("Latitud", placeholder="Ej: 40.4168")
+
+with col2:
+    lon = st.text_input("Longitud", placeholder="Ej: -3.7038")
+
+if lat and lon:
+    ubicacion = f"@{lat}, {lon}z"
+
 
 params_policia = {
   "engine": "google_maps",
   "q": "Policia",
-  "ll": ubicacion,
+  "ll": "@40.417031, -3.683458,14z",
   "api_key": "596f9ae7b1bd024900ced0189a2c07e3210b9f24e8cc3098176870aa480b8037"
 }
 search_policia = GoogleSearch(params_policia)
@@ -99,7 +109,7 @@ coordenadas_policia = [
 params_discoteca = {
   "engine": "google_maps",
   "q": "Discoteca",
-  "ll": ubicacion,
+  "ll": "@40.417031, -3.683458,14z",
   "api_key": "596f9ae7b1bd024900ced0189a2c07e3210b9f24e8cc3098176870aa480b8037"
 }
 search_discoteca = GoogleSearch(params_discoteca)
@@ -113,7 +123,7 @@ coordenadas_discoteca = [
 params_club = {
   "engine": "google_maps",
   "q": "Club de noche",
-  "ll": ubicacion,
+  "ll": "@40.417031, -3.683458,14z",
   "api_key": "596f9ae7b1bd024900ced0189a2c07e3210b9f24e8cc3098176870aa480b8037"
 }
 search_club = GoogleSearch(params_club)
@@ -128,7 +138,7 @@ coordenadas_club = [
 params_bar = {
   "engine": "google_maps",
   "q": "Bar de noche",
-  "ll": ubicacion,
+  "ll": "@40.417031, -3.683458,14z",
   "api_key": "596f9ae7b1bd024900ced0189a2c07e3210b9f24e8cc3098176870aa480b8037"
 }
 search_bar = GoogleSearch(params_bar)
@@ -288,12 +298,13 @@ with st.sidebar:
             st.page_link("pages/dashboard_alertas.py", label="Dashboard Alertas", icon=":material/bar_chart_4_bars:")
             st.page_link("pages/modelo_optimizacion_estatal.py", label="Modelo Optimización Estatal", icon=":material/modeling:")
             st.page_link("pages/modelo_optimizacion_local.py", label="Modelo Optimización Local", icon=":material/modeling:")
+            st.page_link("pages/analisis_eventos.py", label="Analisis de eventos", icon=":material/modeling:")
 
         st.session_state["usuario"] = usuario
         st.session_state["permisos"] = permisos  # Guardar permisos globalmen
 
         # Botón para cerrar la sesión
-        btnSalir=st.button("Salir")
+        btnSalir=st.button("🔙")
         if btnSalir:
             st.session_state.clear()
             # Luego de borrar el Session State reiniciamos la app para mostrar la opción de usuario y clave
